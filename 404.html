@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta name="description" content="页面未找到 - 404错误">
+    <title>404 - 页面未找到</title>
+    <style>
+        /* RESET & 基础样式 - 极简重置，提升性能 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击灰层 */
+        }
+
+        body {
+            /* 柔和渐变背景，轻量级，无图片请求 */
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, sans-serif;
+            padding: 20px;
+            /* 提升文字渲染 */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 主卡片 - 毛玻璃质感轻量版（半透明，无过重滤镜） */
+        .error-card {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);  /* 轻微模糊，视觉舒适，不影响性能 */
+            border-radius: 48px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.02);
+            padding: 2.5rem 1.8rem 3rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* 404 超大数字 + 浮动动画 (纯transform动画，性能极优) */
+        .glitch-number {
+            font-size: clamp(5rem, 20vw, 9rem);
+            font-weight: 800;
+            line-height: 1;
+            color: #1e2f3e;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.35rem;
+            display: inline-block;
+            animation: floatSoft 2.8s ease-in-out infinite;
+            text-shadow: 4px 4px 12px rgba(0, 0, 0, 0.05);
+            /* 优雅的渐变色文字 (轻量) */
+            background: linear-gradient(135deg, #1e2f3e 0%, #2c4c6b 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+
+        /* 浮动关键帧 - 只使用 translateY，无重绘成本 */
+        @keyframes floatSoft {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* 装饰动态线 - 优雅脉动宽度动画 (增强趣味，轻量) */
+        .animated-line {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff8c5a, #ff5e7c, #ff8c5a);
+            margin: 1.2rem auto 1.5rem auto;
+            border-radius: 4px;
+            animation: linePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+            0% {
+                width: 50px;
+                opacity: 0.5;
+            }
+            50% {
+                width: 120px;
+                opacity: 1;
+            }
+            100% {
+                width: 50px;
+                opacity: 0.5;
+            }
+        }
+
+        /* 主标题 */
+        .oops-title {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #1e2f3e;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* 描述文案 */
+        .desc-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #5b6f82;
+            margin-bottom: 2rem;
+            padding: 0 8px;
+            font-weight: 450;
+        }
+
+        /* 幽默小表情/提示 可爱风格 */
+        .hint-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            animation: subtleBounce 2s infinite ease;
+        }
+
+        @keyframes subtleBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 按钮容器 */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        /* 主要返回按钮 — 大触摸区域，移动友好 */
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #1e2f3e;
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 14px 28px;
+            border-radius: 60px;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(105deg, #1e2f3e 0%, #2c4c6b 100%);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.3px;
+            min-width: 160px;
+        }
+
+        /* 次要返回（可选）增加一个返回上一页的辅助按钮，提升移动体验 */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(30, 47, 62, 0.08);
+            backdrop-filter: blur(4px);
+            color: #2c4c6b;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 14px 24px;
+            border-radius: 60px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(44, 76, 107, 0.2);
+            min-width: 140px;
+        }
+
+        /* 悬停/点击反馈（移动端触摸反馈优化） */
+        .btn-home:active {
+            transform: scale(0.96);
+            background: linear-gradient(105deg, #14232e 0%, #1f3b50 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back:active {
+            transform: scale(0.96);
+            background: rgba(30, 47, 62, 0.15);
+        }
+
+        /* 为了更明显的移动点击区域，增加最小触碰尺寸 */
+        .btn-home, .btn-back {
+            min-height: 52px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 桌面悬停效果（优雅过渡，不影响移动） */
+        @media (hover: hover) {
+            .btn-home:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 14px 26px rgba(0, 0, 0, 0.12);
+                background: linear-gradient(105deg, #253f52 0%, #2f5577 100%);
+            }
+            .btn-back:hover {
+                background: rgba(30, 47, 62, 0.15);
+                border-color: rgba(44, 76, 107, 0.4);
+                transform: translateY(-2px);
+            }
+        }
+
+        /* 额外的微小点缀 — 增加趣味，无额外请求 */
+        .micro-icon {
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        /* 底部footer不影响主要内容 */
+        .credit {
+            margin-top: 2.5rem;
+            font-size: 0.7rem;
+            color: #9aabb8;
+            opacity: 0.7;
+            letter-spacing: 0.3px;
+        }
+
+        /* 确保卡片在超小设备上边距舒适 */
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 2rem 1.5rem 2.5rem;
+                border-radius: 36px;
+            }
+            .oops-title {
+                font-size: 1.5rem;
+            }
+            .desc-text {
+                font-size: 0.92rem;
+                margin-bottom: 1.8rem;
+            }
+            .btn-home, .btn-back {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+                min-width: 140px;
+            }
+            .action-buttons {
+                gap: 12px;
+            }
+        }
+
+        /* 针对超小高度布局 (例如折叠屏) 避免挤压 */
+        @media (max-height: 600px) {
+            .error-card {
+                padding: 1.5rem 1.5rem 2rem;
+            }
+            .hint-emoji {
+                font-size: 2rem;
+                margin-bottom: 0.2rem;
+            }
+            .desc-text {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* 动画优化：减少动画（如果用户偏好减少动画，尊重设置） */
+        @media (prefers-reduced-motion: reduce) {
+            .glitch-number, .animated-line, .hint-emoji {
+                animation: none;
+            }
+            .glitch-number {
+                transform: translateY(0);
+            }
+            .animated-line {
+                width: 80px;
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card" role="main" aria-label="404 错误页面">
+        <!-- 装饰小图标 (动态emoji) 增加亲和力 -->
+        <div class="hint-emoji" aria-hidden="true">
+            🔍✨
+        </div>
+        
+        <!-- 超大动态404数字，带浮动动画 -->
+        <div>
+            <span class="glitch-number" aria-label="404 状态码">404</span>
+        </div>
+        
+        <!-- 动态装饰线条 (宽度周期性变化, 视觉引导) -->
+        <div class="animated-line" aria-hidden="true"></div>
+        
+        <!-- 主标题 -->
+        <h1 class="oops-title">哎呀！页面走丢了</h1>
+        
+        <!-- 描述文案 友好清晰 -->
+        <p class="desc-text">
+            您访问的页面可能已被移动、删除，或从未存在。<br>
+            不如回到首页，重新开始探索吧～
+        </p>
+        
+        <!-- 按钮组：主要回家  + 辅助返回上一页（提升移动模式易用性） -->
+        <div class="action-buttons">
+            <a href="/" class="btn-home" aria-label="返回首页">
+                <span class="micro-icon">🏠</span>
+                <span>返回首页</span>
+            </a>
+            <button class="btn-back" id="goBackBtn" aria-label="返回上一页">
+                <span class="micro-icon">↻</span>
+                <span>上一页</span>
+            </button>
+        </div>
+        
+        <!-- 微小的点缀文字，增加幽默感，不影响核心 -->
+        <div class="credit">
+            ✨ 迷路也是一种遇见 · 404 not found ✨
+        </div>
+    </div>
+
+    <!-- 极简JS用于返回上一页功能，无第三方库，轻量快速 -->
+    <script>
+        (function() {
+            // 确保移动端返回按钮行为: 如果有历史记录则返回，否则可以导向首页(备用)
+            const backButton = document.getElementById('goBackBtn');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // 支持浏览器返回：如果存在上一页则返回上一页，否则优雅降级跳转至首页
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        // 如果没有历史记录，安全跳转至根目录
+                        window.location.href = '/';
+                    }
+                });
+            }
+
+            // 可选: 对首页按钮的无侵入保护, 但默认a标签href="/"完全够用
+            // 额外处理: 确保所有可点元素没有控制台报错，提升体验 (防止某些路径情况下链接点击无效)
+            const homeLink = document.querySelector('.btn-home');
+            if (homeLink && homeLink.getAttribute('href') === '/') {
+                // 无需额外操作，保证移动端点击即可，不干扰默认事件
+                // 纯粹为了保证在本地演示时提示友好，不会因为file协议出错而不反应
+                // 增加极小控制：如果是本地file协议且跳转无效果，控制台不报错即可，但绝大多数部署域名下正常
+            }
+        })();
+    </script>
+</body>
+</html>
