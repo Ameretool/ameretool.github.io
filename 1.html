@@ -11,7 +11,7 @@
     <!-- 🚫 屏蔽搜索引擎收录 -->
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     
-    <!-- 引入极客字体 -->
+    <!-- 极客字体 -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -21,146 +21,123 @@
             width: 100%; height: 100%;
             background: #000;
             overflow: hidden;
-            font-family: 'JetBrains Mono', monospace; /* 极客等宽字体 */
+            font-family: 'JetBrains Mono', monospace;
             color: #fff;
+            /* 优化移动端触摸手感 */
+            -webkit-tap-highlight-color: transparent; 
         }
 
-        /* 画布背景层 */
         #canvas-bg {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 1;
         }
 
-        /* 边缘暗角，让视觉聚焦在中心 */
+        /* 边缘暗角，让视觉聚焦 */
         .vignette {
-            position: absolute;
-            z-index: 2;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 20%, #000 90%);
+            position: absolute; z-index: 2; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 10%, #000 95%);
             pointer-events: none;
         }
 
-        /* 中心内容区 */
+        /* 内容容器 */
         .content-wrapper {
-            position: relative;
-            z-index: 3;
-            width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: relative; z-index: 3; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
         /* 主标题 */
         .main-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 4px;
-            margin-bottom: 4rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+            font-size: 2rem; font-weight: 700; letter-spacing: 6px;
+            margin-bottom: 4rem; text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            text-align: center;
         }
 
         /* 矩阵容器 */
         .matrix-container {
-            display: flex;
-            gap: 4rem; /* 菱形之间的间距要拉大，因为旋转后会占用更多空间 */
-            justify-content: center;
-            align-items: center;
+            display: flex; gap: 4rem; justify-content: center; align-items: center;
+            margin-bottom: 3rem; /* 给底部页脚留空间 */
         }
 
-        /* 🌟 核心：菱形卡片 */
+        /* 菱形卡片 */
         .entity {
-            position: relative;
-            width: 10rem;
-            height: 10rem;
-            background: radial-gradient(circle at center, rgba(20,20,20,0.9), rgba(5,5,5,0.9));
+            position: relative; width: 10rem; height: 10rem;
+            background: radial-gradient(circle at center, rgba(20,20,20,0.9), rgba(5,5,5,0.95));
             border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 4px;
-            /* 旋转 45 度变成菱形 */
-            transform: rotate(45deg);
-            /* 浮动动画 */
-            animation: float 6s ease-in-out infinite;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            text-decoration: none;
+            transform: rotate(45deg); /* 旋转成菱形 */
+            animation: float 8s ease-in-out infinite; /* 浮动变慢 */
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            text-decoration: none; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        /* 内部内容反向旋转回来，保持正立 */
+        /* 内部文字反向旋转保持正立 */
         .inner-content {
             transform: rotate(-45deg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
             width: 100%;
         }
 
-        .entity .icon {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
-            transition: transform 0.5s ease;
-        }
+        .entity .icon { font-size: 2.5rem; margin-bottom: 8px; transition: transform 0.4s ease; }
+        .entity .title { font-size: 1rem; font-weight: 700; color: #ddd; margin-bottom: 4px; }
+        .entity .desc { font-size: 0.75rem; color: #777; }
 
-        .entity .title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #ddd;
-            margin-bottom: 4px;
-        }
-        .entity .desc {
-            font-size: 0.75rem;
-            color: #777;
-        }
-
-        /* 🌟 Hover 特效：发光、变白、放大 */
+        /* Hover 特效 (PC) */
         .entity:hover {
             border-color: rgba(255, 255, 255, 0.8);
             box-shadow: 0 0 40px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255,255,255,0.1);
             z-index: 10;
         }
         .entity:hover .title { color: #fff; }
-        .entity:hover .desc { color: #aaa; }
         .entity:hover .icon { transform: scale(1.2); }
 
-        /* 错开浮动时间 */
-        .entity:nth-child(2n) { animation-delay: -3s; }
+        /* 点击激活特效 (移动端) */
+        .entity:active {
+            border-color: #fff;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
+            transform: scale(0.95) rotate(45deg); /* 按下时缩进 */
+        }
 
-        /* 浮动动画关键帧（注意必须带上 rotate(45deg)，否则动画会覆盖旋转） */
+        .entity:nth-child(2n) { animation-delay: -4s; }
+
+        /* 浮动动画 */
         @keyframes float {
             0% { transform: translateY(0) rotate(45deg); }
             50% { transform: translateY(-15px) rotate(45deg); }
             100% { transform: translateY(0) rotate(45deg); }
         }
 
+        /* 🌟 极客页脚 */
+        .footer {
+            position: fixed; bottom: 20px; left: 0; width: 100%;
+            text-align: center; font-size: 11px; color: rgba(255,255,255,0.4);
+            z-index: 10; line-height: 1.6;
+        }
+        .footer a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s; font-weight: bold; }
+        .footer a:hover { color: #fff; }
+
         /* 移动端适配 */
         @media (max-width: 600px) {
-            .matrix-container { gap: 3rem; flex-direction: row; flex-wrap: wrap; }
-            .entity { width: 8rem; height: 8rem; }
-            .entity .icon { font-size: 2rem; }
+            .main-title { font-size: 1.6rem; margin-bottom: 3rem; letter-spacing: 4px; }
+            .matrix-container { gap: 2.5rem; flex-wrap: wrap; }
+            .entity { width: 7.5rem; height: 7.5rem; } /* 手机端菱形缩小，保证在一屏内 */
+            .entity .icon { font-size: 1.8rem; }
             .entity .title { font-size: 0.85rem; }
-            .main-title { margin-bottom: 3rem; font-size: 1.6rem; }
+            .entity .desc { font-size: 0.65rem; }
+            .footer { font-size: 10px; bottom: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 背景粒子 -->
     <canvas id="canvas-bg"></canvas>
     <div class="vignette"></div>
 
-    <!-- 内容区 -->
     <div class="content-wrapper">
         <div class="main-title">Geek Base</div>
 
         <div class="matrix-container">
-            
             <!-- 卡片 1 -->
             <a href="https://nav.gb.ooo" class="entity">
                 <div class="inner-content">
@@ -178,8 +155,8 @@
                     <div class="desc">开源排行</div>
                 </div>
             </a>
-
-            <!-- 卡片 3 (后期添加)
+            
+            <!-- 后期添加：
             <a href="https://blog.gb.ooo" class="entity">
                 <div class="inner-content">
                     <div class="icon">📝</div>
@@ -188,9 +165,14 @@
                 </div>
             </a>
             -->
-
         </div>
     </div>
+
+    <!-- 🌟 补齐的页脚 -->
+    <footer class="footer">
+        <p>&copy; 2024 <a href="https://gb.ooo">Geek Base (gb.ooo)</a>. All rights reserved.</p>
+        <p style="margin-top:4px; opacity:0.7;">Powered by Cloudflare Pages</p>
+    </footer>
 
     <script>
         const canvas = document.getElementById('canvas-bg');
@@ -204,12 +186,8 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // 核心修改：强制粒子只能走 4 个对角线方向，形成交叉网格
         const directions = [
-            { x: 1, y: 1 },   // 右下
-            { x: -1, y: -1 }, // 左上
-            { x: 1, y: -1 },  // 右上
-            { x: -1, y: 1 }   // 左下
+            { x: 1, y: 1 }, { x: -1, y: -1 }, { x: 1, y: -1 }, { x: -1, y: 1 }
         ];
 
         class Mote {
@@ -222,14 +200,14 @@
                     this.x = Math.random() * width;
                     this.y = Math.random() * height;
                 } else {
-                    // 如果越界，从屏幕外重新进入，形成无缝循环
+                    // 越界后从屏幕外重新进入
                     this.x = Math.random() > 0.5 ? 0 : width;
                     this.y = Math.random() * height;
                 }
                 
-                // 随机挑选一个方向，速度随机（形成长短不一的线条）
                 const dir = directions[Math.floor(Math.random() * directions.length)];
-                const speed = 1 + Math.random() * 2; 
+                // 🌟 核心降速：速度范围变成 0.2 到 1.0
+                const speed = 0.2 + Math.random() * 0.8; 
                 this.vx = dir.x * speed;
                 this.vy = dir.y * speed;
             }
@@ -238,30 +216,29 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // 如果出界，重置
-                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                if (this.x < -50 || this.x > width + 50 || this.y < -50 || this.y > height + 50) {
                     this.reset();
                 }
             }
 
             draw() {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2); // 笔触更细
-                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
                 ctx.fill();
                 ctx.closePath();
             }
         }
 
         const particles = [];
-        // 增加粒子数量，形成密集的流星雨网格
-        for (let i = 0; i < 100; i++) {
+        // 稍微增加一点数量，弥补降速后的视觉空洞感
+        for (let i = 0; i < 120; i++) {
             particles.push(new Mote());
         }
 
         function animate() {
-            // 关键：用极低透明度的黑色清空画布，形成很长的“拖影”
-            ctx.fillStyle = "rgba(0, 0, 0, 0.06)"; 
+            // 拖影效果，数值越小拖影越长 (0.04 让线条拉长)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.04)"; 
             ctx.fillRect(0, 0, width, height);
 
             particles.forEach(p => {
