@@ -5,27 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google" content="notranslate">
     
-    <!-- 基础 Meta -->
     <title>Geek Base | gb.ooo</title>
     <meta name="description" content="Geek Base - 极客基地。汇集极客导航、开源排行与各类数字实验。">
     
-    <!-- 🚫 屏蔽搜索引擎收录与网页存档 -->
+    <!-- 🚫 屏蔽搜索引擎收录 -->
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-    <meta name="googlebot" content="noindex, nofollow, noarchive">
     
-    <!-- 网页图标 (如果你有的话，放在同级目录) -->
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- 引入极客字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 基础重置与黑色背景 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         html, body {
             width: 100%; height: 100%;
-            background: #050505;
+            background: #000;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'JetBrains Mono', monospace; /* 极客等宽字体 */
             color: #fff;
-            /* 默认强制深色模式，符合极客设定 */
         }
 
         /* 画布背景层 */
@@ -36,12 +33,12 @@
             z-index: 1;
         }
 
-        /* 边缘暗角，让中心视觉更聚焦 */
+        /* 边缘暗角，让视觉聚焦在中心 */
         .vignette {
             position: absolute;
             z-index: 2;
             width: 100%; height: 100%;
-            background: radial-gradient(transparent 20%, rgba(0,0,0,0.9) 90%);
+            background: radial-gradient(circle, transparent 20%, #000 90%);
             pointer-events: none;
         }
 
@@ -58,143 +55,148 @@
 
         /* 主标题 */
         .main-title {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
-            text-align: center;
+            letter-spacing: 4px;
+            margin-bottom: 4rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
         }
 
-        /* 矩阵卡片容器 */
+        /* 矩阵容器 */
         .matrix-container {
             display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
+            gap: 4rem; /* 菱形之间的间距要拉大，因为旋转后会占用更多空间 */
             justify-content: center;
-            max-width: 800px;
-            padding: 0 20px;
+            align-items: center;
         }
 
-        /* 极客卡片 (复刻你截图里的方块) */
+        /* 🌟 核心：菱形卡片 */
         .entity {
             position: relative;
-            width: 12rem;
-            height: 12rem;
-            background-color: rgba(0, 0, 0, 0.9);
-            background: radial-gradient(rgba(8, 8, 8, 0.85), #050505);
-            box-shadow: 0 0 10rem rgba(255, 255, 255, 0.0375);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            width: 10rem;
+            height: 10rem;
+            background: radial-gradient(circle at center, rgba(20,20,20,0.9), rgba(5,5,5,0.9));
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            /* 旋转 45 度变成菱形 */
+            transform: rotate(45deg);
+            /* 浮动动画 */
+            animation: float 6s ease-in-out infinite;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            text-decoration: none;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 内部内容反向旋转回来，保持正立 */
+        .inner-content {
+            transform: rotate(-45deg);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
-            color: #aaa;
-            /* 浮动动画 */
-            animation: float 5s ease-in-out infinite;
-            transition: all 0.5s ease-out;
+            text-align: center;
+            width: 100%;
         }
 
-        /* 卡片内部图标 (用 Emoji 代替复杂的 SVG) */
         .entity .icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
             transition: transform 0.5s ease;
         }
 
-        /* 卡片文字 */
         .entity .title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 5px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ddd;
+            margin-bottom: 4px;
         }
         .entity .desc {
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.75rem;
+            color: #777;
         }
 
-        /* 悬浮效果 */
+        /* 🌟 Hover 特效：发光、变白、放大 */
         .entity:hover {
             border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 10rem rgba(255, 255, 255, 0.15);
-            color: #fff;
-            z-index: 4;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255,255,255,0.1);
+            z-index: 10;
         }
-        .entity:hover .icon {
-            transform: scale(1.2);
-        }
+        .entity:hover .title { color: #fff; }
+        .entity:hover .desc { color: #aaa; }
+        .entity:hover .icon { transform: scale(1.2); }
 
-        /* 错开动画时间 */
-        .entity:nth-child(2n) { animation-delay: -2.5s; }
+        /* 错开浮动时间 */
+        .entity:nth-child(2n) { animation-delay: -3s; }
 
-        /* 浮动动画关键帧 */
+        /* 浮动动画关键帧（注意必须带上 rotate(45deg)，否则动画会覆盖旋转） */
         @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0); }
+            0% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-15px) rotate(45deg); }
+            100% { transform: translateY(0) rotate(45deg); }
         }
 
         /* 移动端适配 */
         @media (max-width: 600px) {
-            .matrix-container { gap: 1.5rem; }
-            .entity { width: 9rem; height: 9rem; }
-            .entity .icon { font-size: 2.2rem; }
-            .entity .title { font-size: 0.95rem; }
-            .entity .desc { font-size: 0.7rem; }
-            .main-title { font-size: 1.8rem; }
+            .matrix-container { gap: 3rem; flex-direction: row; flex-wrap: wrap; }
+            .entity { width: 8rem; height: 8rem; }
+            .entity .icon { font-size: 2rem; }
+            .entity .title { font-size: 0.85rem; }
+            .main-title { margin-bottom: 3rem; font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 粒子背景层 -->
+    <!-- 背景粒子 -->
     <canvas id="canvas-bg"></canvas>
-    <!-- 暗角 -->
     <div class="vignette"></div>
 
     <!-- 内容区 -->
     <div class="content-wrapper">
-        <!-- 标题 -->
         <div class="main-title">Geek Base</div>
 
-        <!-- 🌟 卡片矩阵：后期加项目直接在这里加 <a> 标签即可 -->
         <div class="matrix-container">
             
             <!-- 卡片 1 -->
             <a href="https://nav.gb.ooo" class="entity">
-                <div class="icon">🌐</div>
-                <div class="title">Geek Nav</div>
-                <div class="desc">极客导航</div>
+                <div class="inner-content">
+                    <div class="icon">🌐</div>
+                    <div class="title">Geek Nav</div>
+                    <div class="desc">极客导航</div>
+                </div>
             </a>
 
             <!-- 卡片 2 -->
             <a href="https://grank.gb.ooo" class="entity">
-                <div class="icon">📊</div>
-                <div class="title">GitHub Rank</div>
-                <div class="desc">开源排行</div>
+                <div class="inner-content">
+                    <div class="icon">📊</div>
+                    <div class="title">GitHub Rank</div>
+                    <div class="desc">开源排行</div>
+                </div>
             </a>
 
-            <!-- 卡片 3 (示例：后期增加)
+            <!-- 卡片 3 (后期添加)
             <a href="https://blog.gb.ooo" class="entity">
-                <div class="icon">📝</div>
-                <div class="title">Blog</div>
-                <div class="desc">折腾笔记</div>
+                <div class="inner-content">
+                    <div class="icon">📝</div>
+                    <div class="title">Blog</div>
+                    <div class="desc">折腾笔记</div>
+                </div>
             </a>
             -->
 
         </div>
     </div>
 
-    <!-- 原生 JS 实现的背景粒子特效 -->
     <script>
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
         let width, height;
 
-        // 适配分辨率
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
@@ -202,45 +204,64 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // 粒子类
+        // 核心修改：强制粒子只能走 4 个对角线方向，形成交叉网格
+        const directions = [
+            { x: 1, y: 1 },   // 右下
+            { x: -1, y: -1 }, // 左上
+            { x: 1, y: -1 },  // 右上
+            { x: -1, y: 1 }   // 左下
+        ];
+
         class Mote {
             constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                // 随机移动方向
-                this.vx = (Math.random() - 0.5) * 2; 
-                this.vy = (Math.random() - 0.5) * 2;
-                this.radius = 2;
+                this.reset(true);
             }
-            update() {
-                // 边界反弹
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
+            
+            reset(randomPos = false) {
+                if (randomPos) {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                } else {
+                    // 如果越界，从屏幕外重新进入，形成无缝循环
+                    this.x = Math.random() > 0.5 ? 0 : width;
+                    this.y = Math.random() * height;
+                }
+                
+                // 随机挑选一个方向，速度随机（形成长短不一的线条）
+                const dir = directions[Math.floor(Math.random() * directions.length)];
+                const speed = 1 + Math.random() * 2; 
+                this.vx = dir.x * speed;
+                this.vy = dir.y * speed;
+            }
 
+            update() {
                 this.x += this.vx;
                 this.y += this.vy;
+
+                // 如果出界，重置
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.reset();
+                }
             }
+
             draw() {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = "#FFFFFF";
+                ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2); // 笔触更细
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
                 ctx.fill();
                 ctx.closePath();
             }
         }
 
-        // 生成粒子 (原版是 50 个，我们可以稍微多一点增加氛围)
         const particles = [];
-        const particleCount = 60;
-        for (let i = 0; i < particleCount; i++) {
+        // 增加粒子数量，形成密集的流星雨网格
+        for (let i = 0; i < 100; i++) {
             particles.push(new Mote());
         }
 
-        // 动画循环
         function animate() {
-            // 🌟 核心特效：这里不用 clearRect 清空，而是用带有透明度的黑色反复覆盖
-            // 这样就能实现原版那种“拖影/轨迹”的科幻感！
-            ctx.fillStyle = "rgba(0, 0, 0, 0.08)"; 
+            // 关键：用极低透明度的黑色清空画布，形成很长的“拖影”
+            ctx.fillStyle = "rgba(0, 0, 0, 0.06)"; 
             ctx.fillRect(0, 0, width, height);
 
             particles.forEach(p => {
@@ -251,7 +272,6 @@
             requestAnimationFrame(animate);
         }
 
-        // 启动动画
         animate();
     </script>
 </body>
