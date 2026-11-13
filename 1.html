@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    
+    <!-- 基础 Meta -->
+    <title>Geek Base | gb.ooo</title>
+    <meta name="description" content="Geek Base - 极客基地。汇集极客导航、开源排行与各类数字实验。">
+    
+    <!-- 🚫 屏蔽搜索引擎收录与网页存档 -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="googlebot" content="noindex, nofollow, noarchive">
+    
+    <!-- 网页图标 (如果你有的话，放在同级目录) -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <style>
+        /* 基础重置与黑色背景 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            background: #050505;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+            /* 默认强制深色模式，符合极客设定 */
+        }
+
+        /* 画布背景层 */
+        #canvas-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* 边缘暗角，让中心视觉更聚焦 */
+        .vignette {
+            position: absolute;
+            z-index: 2;
+            width: 100%; height: 100%;
+            background: radial-gradient(transparent 20%, rgba(0,0,0,0.9) 90%);
+            pointer-events: none;
+        }
+
+        /* 中心内容区 */
+        .content-wrapper {
+            position: relative;
+            z-index: 3;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 主标题 */
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            text-align: center;
+        }
+
+        /* 矩阵卡片容器 */
+        .matrix-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        /* 极客卡片 (复刻你截图里的方块) */
+        .entity {
+            position: relative;
+            width: 12rem;
+            height: 12rem;
+            background-color: rgba(0, 0, 0, 0.9);
+            background: radial-gradient(rgba(8, 8, 8, 0.85), #050505);
+            box-shadow: 0 0 10rem rgba(255, 255, 255, 0.0375);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #aaa;
+            /* 浮动动画 */
+            animation: float 5s ease-in-out infinite;
+            transition: all 0.5s ease-out;
+        }
+
+        /* 卡片内部图标 (用 Emoji 代替复杂的 SVG) */
+        .entity .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            transition: transform 0.5s ease;
+        }
+
+        /* 卡片文字 */
+        .entity .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .entity .desc {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* 悬浮效果 */
+        .entity:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10rem rgba(255, 255, 255, 0.15);
+            color: #fff;
+            z-index: 4;
+        }
+        .entity:hover .icon {
+            transform: scale(1.2);
+        }
+
+        /* 错开动画时间 */
+        .entity:nth-child(2n) { animation-delay: -2.5s; }
+
+        /* 浮动动画关键帧 */
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .matrix-container { gap: 1.5rem; }
+            .entity { width: 9rem; height: 9rem; }
+            .entity .icon { font-size: 2.2rem; }
+            .entity .title { font-size: 0.95rem; }
+            .entity .desc { font-size: 0.7rem; }
+            .main-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子背景层 -->
+    <canvas id="canvas-bg"></canvas>
+    <!-- 暗角 -->
+    <div class="vignette"></div>
+
+    <!-- 内容区 -->
+    <div class="content-wrapper">
+        <!-- 标题 -->
+        <div class="main-title">Geek Base</div>
+
+        <!-- 🌟 卡片矩阵：后期加项目直接在这里加 <a> 标签即可 -->
+        <div class="matrix-container">
+            
+            <!-- 卡片 1 -->
+            <a href="https://nav.gb.ooo" class="entity">
+                <div class="icon">🌐</div>
+                <div class="title">Geek Nav</div>
+                <div class="desc">极客导航</div>
+            </a>
+
+            <!-- 卡片 2 -->
+            <a href="https://grank.gb.ooo" class="entity">
+                <div class="icon">📊</div>
+                <div class="title">GitHub Rank</div>
+                <div class="desc">开源排行</div>
+            </a>
+
+            <!-- 卡片 3 (示例：后期增加)
+            <a href="https://blog.gb.ooo" class="entity">
+                <div class="icon">📝</div>
+                <div class="title">Blog</div>
+                <div class="desc">折腾笔记</div>
+            </a>
+            -->
+
+        </div>
+    </div>
+
+    <!-- 原生 JS 实现的背景粒子特效 -->
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        // 适配分辨率
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // 粒子类
+        class Mote {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                // 随机移动方向
+                this.vx = (Math.random() - 0.5) * 2; 
+                this.vy = (Math.random() - 0.5) * 2;
+                this.radius = 2;
+            }
+            update() {
+                // 边界反弹
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        // 生成粒子 (原版是 50 个，我们可以稍微多一点增加氛围)
+        const particles = [];
+        const particleCount = 60;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Mote());
+        }
+
+        // 动画循环
+        function animate() {
+            // 🌟 核心特效：这里不用 clearRect 清空，而是用带有透明度的黑色反复覆盖
+            // 这样就能实现原版那种“拖影/轨迹”的科幻感！
+            ctx.fillStyle = "rgba(0, 0, 0, 0.08)"; 
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // 启动动画
+        animate();
+    </script>
+</body>
+</html>
