@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 颜色变量生成器</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* 取色区域 */
+        .picker-area {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .picker-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .hex-value {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* 颜色网格 */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 400px) {
+            .palette-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .color-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-card:active {
+            transform: scale(0.95);
+        }
+
+        .color-swatch {
+            height: 60px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .color-info {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .color-weight {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        /* 复制整套按钮 */
+        .copy-all-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .copy-all-btn:active {
+            opacity: 0.8;
+        }
+
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>CSS 变量生成器</h1>
+        <p>选个主色，一键生成整套色板</p>
+    </div>
+
+    <div class="picker-area">
+        <div class="picker-left">
+            <input type="color" id="colorPicker" value="#3b82f6">
+            <div class="hex-value" id="hexDisplay">#3B82F6</div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">点击色块复制</div>
+    </div>
+
+    <div class="palette-grid" id="paletteGrid">
+        <!-- 色块由 JS 自动生成 -->
+    </div>
+
+    <button class="copy-all-btn" id="copyAllBtn">复制所有 CSS 变量</button>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板！</div>
+
+<script>
+    // 获取 DOM 元素
+    const colorPicker = document.getElementById('colorPicker');
+    const hexDisplay = document.getElementById('hexDisplay');
+    const paletteGrid = document.getElementById('paletteGrid');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const toast = document.getElementById('toast');
+
+    // 预设的色阶亮度 (类似 Tailwind)
+    const weights = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+    const lightnessMap = {
+        50: 96, 100: 92, 200: 84, 300: 74, 400: 64, 
+        500: 50, 600: 40, 700: 30, 800: 20, 900: 12
+    };
+
+    // 当前生成的色值数据
+    let currentPalette = {};
+
+    // HEX 转 HSL
+    function hexToHsl(hex) {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0; 
+        } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return [h * 360, s * 100, l * 100];
+    }
+
+    // HSL 转 HEX
+    function hslToHex(h, s, l) {
+        l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+    }
+
+    // 生成色板
+    function generatePalette(baseHex) {
+        const [h, s, l] = hexToHsl(baseHex);
+        paletteGrid.innerHTML = '';
+        currentPalette = {};
+
+        weights.forEach(weight => {
+            // 根据基础色微调饱和度和亮度，让颜色看起来更和谐
+            let targetL = lightnessMap[weight];
+            // 越是浅色，饱和度越低；越是深色，饱和度稍微高一点
+            let targetS = s;
+            if (weight < 500) targetS = Math.max(0, s - (500 - weight) * 0.1);
+            
+            const hex = hslToHex(h, targetS, targetL);
+            currentPalette[weight] = hex;
+
+            // 创建卡片
+            const card = document.createElement('div');
+            card.className = 'color-card';
+            card.onclick = () => copyText(hex);
+
+            card.innerHTML = `
+                <div class="color-swatch" style="background-color: ${hex};"></div>
+                <div class="color-info">
+                    <div class="color-weight">${weight}</div>
+                    <div>${hex}</div>
+                </div>
+            `;
+            paletteGrid.appendChild(card);
+        });
+    }
+
+    // 复制文本
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`已复制: ${text}`);
+        }).catch(err => {
+            // 兼容非 HTTPS 环境
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast(`已复制: ${text}`);
+        });
+    }
+
+    // 显示提示框
+    function showToast(msg) {
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // 监听取色器变化
+    colorPicker.addEventListener('input', (e) => {
+        const hex = e.target.value.toUpperCase();
+        hexDisplay.innerText = hex;
+        generatePalette(hex);
+    });
+
+    // 监听复制全部按钮
+    copyAllBtn.addEventListener('click', () => {
+        let cssCode = `:root {\n`;
+        weights.forEach(w => {
+            cssCode += `  --color-primary-${w}: ${currentPalette[w]};\n`;
+        });
+        cssCode += `}`;
+        copyText(cssCode);
+    });
+
+    // 初始化
+    generatePalette(colorPicker.value);
+</script>
+
+</body>
+</html>
